@@ -1,0 +1,527 @@
+[
+    {
+        "id": "72e5d2bf.befedc",
+        "type": "mqtt in",
+        "z": "2f456113.d800ae",
+        "name": "",
+        "topic": "DHT11out",
+        "qos": "1",
+        "datatype": "auto",
+        "broker": "a07c845e.d0fa28",
+        "x": 463.9999694824219,
+        "y": 363.0000591278076,
+        "wires": [
+            [
+                "37e8a036.3df81"
+            ]
+        ]
+    },
+    {
+        "id": "37e8a036.3df81",
+        "type": "function",
+        "z": "2f456113.d800ae",
+        "name": "split string",
+        "func": "var output = msg.payload.split(\" \");\n \nvar msg1 = {payload:output[0] + \" °C\"};\nvar msg2 = {payload:output[1] + \" %\"};\n\nreturn [msg1,msg2];",
+        "outputs": "2",
+        "noerr": 0,
+        "x": 720.9999732971191,
+        "y": 366.0000591278076,
+        "wires": [
+            [
+                "adcd4543.31f128"
+            ],
+            [
+                "fb0af078.988e9"
+            ]
+        ]
+    },
+    {
+        "id": "adcd4543.31f128",
+        "type": "function",
+        "z": "2f456113.d800ae",
+        "name": "string to float",
+        "func": "msg.payload = parseFloat(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 983.9999771118164,
+        "y": 277.00006103515625,
+        "wires": [
+            [
+                "cce1b6cf.f5e558"
+            ]
+        ]
+    },
+    {
+        "id": "fb0af078.988e9",
+        "type": "function",
+        "z": "2f456113.d800ae",
+        "name": "string to float",
+        "func": "msg.payload = parseFloat(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 989.0000877380371,
+        "y": 418.00009059906006,
+        "wires": [
+            [
+                "d8fc79c8.c501e8"
+            ]
+        ]
+    },
+    {
+        "id": "36dbb1b.a79e84e",
+        "type": "firebase auth",
+        "z": "2f456113.d800ae",
+        "name": "start firebase",
+        "firebaseconfig": "",
+        "x": 559.0000076293945,
+        "y": 250.00006484985352,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "bf01f392.fef1d",
+        "type": "firebase modify",
+        "z": "2f456113.d800ae",
+        "name": "Send hum + timestampi to firebase",
+        "firebaseconfig": "",
+        "childpath": "Humidity",
+        "method": "push",
+        "value": "msg.payload",
+        "priority": "msg.priority",
+        "x": 1644.9999885559082,
+        "y": 396.0000629425049,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "14017351.c6ca0d",
+        "type": "firebase modify",
+        "z": "2f456113.d800ae",
+        "name": "send timestamp + temp",
+        "firebaseconfig": "",
+        "childpath": "Temperature",
+        "method": "push",
+        "value": "msg.payload",
+        "priority": "msg.priority",
+        "x": 1607.9999885559082,
+        "y": 272.000057220459,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cce1b6cf.f5e558",
+        "type": "function",
+        "z": "2f456113.d800ae",
+        "name": "format data before sending",
+        "func": " msg.payload = {\n                \"data\": msg.payload, \n                \"timestamp\": Date.now()\n      };\nreturn msg;\n\n//timestamp in ms\n//timestamp in UTC",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1277.9999809265137,
+        "y": 283.0000591278076,
+        "wires": [
+            [
+                "14017351.c6ca0d"
+            ]
+        ]
+    },
+    {
+        "id": "d8fc79c8.c501e8",
+        "type": "function",
+        "z": "2f456113.d800ae",
+        "name": "format data before sending",
+        "func": " msg.payload = {\n                \"data\": msg.payload, \n                \"timestamp\": Date.now()\n      };\nreturn msg;\n\n//timestamp in ms\n//timestamp in UTC",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1286.9999809265137,
+        "y": 406.0000629425049,
+        "wires": [
+            [
+                "bf01f392.fef1d",
+                "2fd7eac4.f2ac26"
+            ]
+        ]
+    },
+    {
+        "id": "699730f6.c0502",
+        "type": "mqtt out",
+        "z": "2f456113.d800ae",
+        "name": "",
+        "topic": "interval",
+        "qos": "1",
+        "retain": "",
+        "broker": "a07c845e.d0fa28",
+        "x": 1159.9999084472656,
+        "y": 99.00004959106445,
+        "wires": []
+    },
+    {
+        "id": "233b5f7a.bf14b",
+        "type": "inject",
+        "z": "2f456113.d800ae",
+        "name": "measuring interval",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "x": 834.0000114440918,
+        "y": 164.000159740448,
+        "wires": [
+            [
+                "699730f6.c0502",
+                "22b20ed1.19d5f2"
+            ]
+        ]
+    },
+    {
+        "id": "22b20ed1.19d5f2",
+        "type": "debug",
+        "z": "2f456113.d800ae",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 1110.7889785766602,
+        "y": 194.1798858642578,
+        "wires": []
+    },
+    {
+        "id": "2fd7eac4.f2ac26",
+        "type": "debug",
+        "z": "2f456113.d800ae",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 1582.9187355041504,
+        "y": 464.10006523132324,
+        "wires": []
+    },
+    {
+        "id": "3c040144.02da8e",
+        "type": "mqtt in",
+        "z": "2f456113.d800ae",
+        "name": "",
+        "topic": "SOIL",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "a07c845e.d0fa28",
+        "x": 562.6999816894531,
+        "y": 532.2000942230225,
+        "wires": [
+            [
+                "2e32d3c0.807edc",
+                "90003b5d.c04e98"
+            ]
+        ]
+    },
+    {
+        "id": "2e32d3c0.807edc",
+        "type": "debug",
+        "z": "2f456113.d800ae",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 873.9999542236328,
+        "y": 628.0001029968262,
+        "wires": []
+    },
+    {
+        "id": "90003b5d.c04e98",
+        "type": "function",
+        "z": "2f456113.d800ae",
+        "name": "string to float",
+        "func": "msg.payload = parseFloat(msg.payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 871.0186614990234,
+        "y": 537.0251560211182,
+        "wires": [
+            [
+                "260f9afe.70c276"
+            ]
+        ]
+    },
+    {
+        "id": "260f9afe.70c276",
+        "type": "function",
+        "z": "2f456113.d800ae",
+        "name": "format data before sending",
+        "func": " msg.payload = {\n                \"data\": msg.payload, \n                \"timestamp\": Date.now()\n      };\nreturn msg;\n\n//timestamp in ms\n//timestamp in UTC",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1163.0187072753906,
+        "y": 541.0251064300537,
+        "wires": [
+            [
+                "69b57a11.bea9a4"
+            ]
+        ]
+    },
+    {
+        "id": "69b57a11.bea9a4",
+        "type": "firebase modify",
+        "z": "2f456113.d800ae",
+        "name": "Send hum + timestampi to firebase",
+        "firebaseconfig": "",
+        "childpath": "Soil Moisture",
+        "method": "push",
+        "value": "msg.payload",
+        "priority": "msg.priority",
+        "x": 1494.0187683105469,
+        "y": 567.0251054763794,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f175dca1.6d61a",
+        "type": "firebase.on",
+        "z": "2f456113.d800ae",
+        "name": "",
+        "firebaseconfig": "",
+        "childpath": "Pump",
+        "atStart": true,
+        "eventType": "value",
+        "queries": [],
+        "x": 727.512451171875,
+        "y": 703.987512588501,
+        "wires": [
+            [
+                "4684cf5e.7e0c3",
+                "587b8358.6f560c"
+            ]
+        ]
+    },
+    {
+        "id": "7a19d6a5.15f198",
+        "type": "mqtt out",
+        "z": "2f456113.d800ae",
+        "name": "",
+        "topic": "PumpState",
+        "qos": "1",
+        "retain": "",
+        "broker": "a07c845e.d0fa28",
+        "x": 1377.6187744140625,
+        "y": 658.0251083374023,
+        "wires": []
+    },
+    {
+        "id": "9b51a8f8.2e0468",
+        "type": "firebase.on",
+        "z": "2f456113.d800ae",
+        "name": "",
+        "firebaseconfig": "",
+        "childpath": "Threshold",
+        "atStart": true,
+        "eventType": "value",
+        "queries": [],
+        "x": 756.6187438964844,
+        "y": 839.0250797271729,
+        "wires": [
+            [
+                "ff4b6a78.22b188",
+                "286c8f17.0c743"
+            ]
+        ]
+    },
+    {
+        "id": "ed8018b7.ea5828",
+        "type": "mqtt out",
+        "z": "2f456113.d800ae",
+        "name": "",
+        "topic": "MoistureThreshold",
+        "qos": "1",
+        "retain": "",
+        "broker": "a07c845e.d0fa28",
+        "x": 1372.618766784668,
+        "y": 781.025110244751,
+        "wires": []
+    },
+    {
+        "id": "286c8f17.0c743",
+        "type": "debug",
+        "z": "2f456113.d800ae",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 1388.5186462402344,
+        "y": 857.0938558578491,
+        "wires": []
+    },
+    {
+        "id": "587b8358.6f560c",
+        "type": "debug",
+        "z": "2f456113.d800ae",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "x": 1382.5248756408691,
+        "y": 714.0875072479248,
+        "wires": []
+    },
+    {
+        "id": "f4450bcf.8213a8",
+        "type": "firebase.on",
+        "z": "2f456113.d800ae",
+        "name": "",
+        "firebaseconfig": "",
+        "childpath": "Threshold_Water",
+        "atStart": true,
+        "eventType": "value",
+        "queries": [],
+        "x": 784.0186462402344,
+        "y": 959.8250522613525,
+        "wires": [
+            [
+                "60374986.1cd698",
+                "2bb57412.fe4d9c"
+            ]
+        ]
+    },
+    {
+        "id": "202bccf0.efdb44",
+        "type": "mqtt out",
+        "z": "2f456113.d800ae",
+        "name": "",
+        "topic": "WateringThreshold",
+        "qos": "1",
+        "retain": "",
+        "broker": "a07c845e.d0fa28",
+        "x": 1514.0186729431152,
+        "y": 926.8250141143799,
+        "wires": []
+    },
+    {
+        "id": "4684cf5e.7e0c3",
+        "type": "function",
+        "z": "2f456113.d800ae",
+        "name": "ToString",
+        "func": "msg.payload = msg.payload.toString();\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1132.918613433838,
+        "y": 666.0250105857849,
+        "wires": [
+            [
+                "7a19d6a5.15f198"
+            ]
+        ]
+    },
+    {
+        "id": "ff4b6a78.22b188",
+        "type": "function",
+        "z": "2f456113.d800ae",
+        "name": "ToString",
+        "func": "msg.payload = msg.payload.toString();\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1182.0187072753906,
+        "y": 798.0250797271729,
+        "wires": [
+            [
+                "ed8018b7.ea5828"
+            ]
+        ]
+    },
+    {
+        "id": "60374986.1cd698",
+        "type": "function",
+        "z": "2f456113.d800ae",
+        "name": "ToString",
+        "func": "msg.payload = msg.payload.toString();\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 1222.018669128418,
+        "y": 947.0252094268799,
+        "wires": [
+            [
+                "202bccf0.efdb44"
+            ]
+        ]
+    },
+    {
+        "id": "f7531a8d.ca1ef8",
+        "type": "mqtt in",
+        "z": "2f456113.d800ae",
+        "name": "",
+        "topic": "MoistureState",
+        "qos": "2",
+        "datatype": "auto",
+        "broker": "a07c845e.d0fa28",
+        "x": 595.9186477661133,
+        "y": 1089.075029373169,
+        "wires": [
+            [
+                "9f83b66c.31fc08"
+            ]
+        ]
+    },
+    {
+        "id": "9f83b66c.31fc08",
+        "type": "firebase modify",
+        "z": "2f456113.d800ae",
+        "name": "",
+        "firebaseconfig": "",
+        "childpath": "Pump",
+        "method": "set",
+        "value": "msg.payload",
+        "priority": "msg.priority",
+        "x": 1221.9123306274414,
+        "y": 1080.0313296318054,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2bb57412.fe4d9c",
+        "type": "debug",
+        "z": "2f456113.d800ae",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 1444.0000915527344,
+        "y": 991.0000152587891,
+        "wires": []
+    },
+    {
+        "id": "a07c845e.d0fa28",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "",
+        "broker": "192.168.137.158",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    }
+]
